@@ -1,5 +1,7 @@
 ## Mapas del Censo 2024 con R
 
+[Tutorial completo aquí.](https://bastianolea.rbind.io/blog/mapas_censo_2024)
+
 Ejemplos para graficar mapas con datos del Censo 2024 por manzanas censales utilizando R.
 
 ### Scripts
