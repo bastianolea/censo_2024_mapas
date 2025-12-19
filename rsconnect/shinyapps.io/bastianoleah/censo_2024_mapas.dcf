@@ -1,0 +1,13 @@
+name: censo_2024_mapas
+title: censo_2024_mapas
+username: bastianoleah
+account: bastianoleah
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 16335431
+bundleId: 11343974
+url: https://bastianoleah.shinyapps.io/censo_2024_mapas/
+version: 1
+asMultiple: FALSE
+asStatic: FALSE
+ignoredFiles: datos/Cartografia_censo2024_Pais/Diccionario_variables_geograficas_CPV24.xlsx|mapa_censo_ggplot.R|mapa_censo_mapgl.R|preprocesar.R|prueba_duckdb.R|readme.md
