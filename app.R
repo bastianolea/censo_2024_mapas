@@ -58,6 +58,8 @@ ui <- page_fluid(
         markdown("Desarrollado por [Bastián Olea Herrera](https://bastianolea.rbind.io) en R."),
         
         p("Visualización de datos del Censo 2024 a nivel de manzana censal. Selecciona una región y comuna, y elige una variable para obtener el mapa."),
+        
+        markdown("Aprende a hacer estos mapas en R [siguiendo este tutorial.](https://bastianolea.rbind.io/blog/mapas_censo_2024/)"),
       ),
       
       # selectores ----

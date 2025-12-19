@@ -5,7 +5,7 @@ account: bastianoleah
 server: shinyapps.io
 hostUrl: https://api.shinyapps.io/v1
 appId: 16335431
-bundleId: 11344002
+bundleId:
 url: https://bastianoleah.shinyapps.io/censo_2024_mapas/
 version: 1
 asMultiple: FALSE
