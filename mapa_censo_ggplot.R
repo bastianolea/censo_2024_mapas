@@ -15,7 +15,7 @@ manzanas_comuna <- manzanas |>
 
 # convertir a sf
 manzanas_comuna_sf <- manzanas_comuna |> 
-  st_as_sf(sf_column_name = "SHAPE", crs = 4326)
+  st_as_sf(crs = 4326)
 
 # gráfico
 manzanas_comuna_sf |> 

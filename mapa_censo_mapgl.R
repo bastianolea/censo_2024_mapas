@@ -18,12 +18,13 @@ manzanas_comuna <- manzanas |>
 
 # convertir a sf
 manzanas_comuna_sf <- manzanas_comuna |> 
-  st_as_sf(sf_column_name = "SHAPE", crs = 4326) |> 
+  st_as_sf(crs = 4326) |> 
   select(REGION, n_edad_60_mas, SHAPE) |>
   rename(geometry = SHAPE)
 
-# se necesita un token en .Renviron
+# para usar mapbox se necesita un token en .Renviron
 # usethis::edit_r_environ()
+# así que usaremos maplibre
 
 maplibre()
 
@@ -51,8 +52,7 @@ manzanas_region_sf <- manzanas_region |>
 # generar mapa interactivo
 mapa_region <- manzanas_region_sf |>
   maplibre_view(column = "n_edad_60_mas",
-                palette = \(n) RColorBrewer::brewer.pal(n, "RdPu")
-                )
+                palette = \(n) RColorBrewer::brewer.pal(n, "PRGn"))
 
 # ver
 mapa_region
