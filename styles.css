@@ -19,3 +19,25 @@ p {
 .azar {
   text-align: right; margin-top: -8px;
 }
+
+.explicacion {
+  color: #666666; 
+  text-align: right;
+  line-height: 1.1 !important;
+}
+
+.id_variable {
+  font-family: Menlo, Courier, monospaced;
+}
+
+/* color de íconos de toolbar de ggiraph */
+.ggiraph-toolbar-icon.neutral {
+  stroke: #AE027E;
+  fill: #AE027E;
+}
+
+/* color de fondo de toolbar de ggiraph */
+.ggiraph-toolbar {
+  background-color: #181818;
+}
+

@@ -2,11 +2,13 @@ library(shiny)
 library(bslib)
 library(dplyr)
 library(ggplot2)
+library(ggiraph)
 library(arrow)
 library(sf)
 library(thematic)
 library(shinycssloaders)
 library(shinydisconnect)
+
 
 thematic_shiny() # tema automático
 
@@ -84,46 +86,66 @@ ui <- page_fluid(
         ),
         
         div(style = "margin-top: -18px;",
-        selectInput("variable", "Variable",
-                    choices = columnas,
-                    selected = "n_inmigrantes",
-                    width = "100%"
-        ),
-        
-        div(class = "azar",
-            actionLink("azar_variable", "Variable aleatoria")
+            selectInput("variable", "Variable",
+                        choices = columnas,
+                        selected = "n_inmigrantes",
+                        width = "100%"
+            ),
+            
+            div(class = "azar",
+                actionLink("azar_variable", "Variable aleatoria")
+            )
         )
-      )
       )
     ),
     
     # mapa ----
-    div(style = "margin-top: -18px;",
-      # card(
-      # card_header(
-      h4(textOutput("titulo_comuna")),
-      h5(textOutput("titulo_region")),
-      div(
-        style = "display: flex; gap: 4px;",
-        span("Variable:"),
-        span(textOutput("titulo_variable"),
-             style = "font-family: Menlo, Courier, monospaced;")
-      ),
-      
-      plotOutput("mapa", height = "600px") |> 
-        withSpinner(proxy.height = 400),
-      # verbatimTextOutput("tabla")
+    div(style = "max-width: 600px; margin: auto; margin-top: -6px;",
+        
+        layout_columns(
+          col_widths = c(6, 6),
+          div(
+            h4(textOutput("titulo_comuna")),
+            h5(textOutput("titulo_region")),
+            div(
+              style = "display: flex; gap: 4px;",
+              span("Variable:"),
+              span(textOutput("titulo_variable"), class = "id_variable")
+            )
+          ),
+          div(
+            style = "display: flex; flex-direction: column; justify-content: flex-end; height: 100%;",
+              em(
+                class = "explicacion",
+                "Para hacer zoom, presionar ícono de lupa",
+                img(src = "lupa_a.png", height = "20px"),  
+                "y hacer scroll sobre el mapa, o presionar la segunda lupa",
+                img(src = "lupa_b.png", height = "20px"),
+                "y seleccionar el área."
+            )
+          )
+        ),
+        
+        # plotOutput("mapa", height = "600px")
+        
+        girafeOutput("mapa_interactivo", height = "600px") |> 
+          withSpinner(proxy.height = 400),
+        
+        # verbatimTextOutput("tabla")
+        
+        
+        br(),
     ),
     
     
     # footer ----
-    div(#style = "font-size: 90%; padding: 28px;",
-        # hr(),
-        markdown("Desarrollado y programado por [Bastián Olea Herrera](https://bastianolea.rbind.io) en R."),
-        
-        markdown("Puedes explorar otras [aplicaciones interactivas sobre datos sociales en mi portafolio.](https://bastianolea.github.io/shiny_apps/)"),
-        
-        markdown("Código de fuente de esta app y del procesamiento de los datos [disponible en GitHub.](https://github.com/bastianolea/censo_2024_mapas)")
+    div(style = "margin-top: 28px;",
+      # hr(),
+      markdown("Desarrollado y programado por [Bastián Olea Herrera](https://bastianolea.rbind.io) en R."),
+      
+      markdown("Puedes explorar otras [aplicaciones interactivas sobre datos sociales en mi portafolio.](https://bastianolea.github.io/shiny_apps/)"),
+      
+      markdown("Código de fuente de esta app y del procesamiento de los datos [disponible en GitHub.](https://github.com/bastianolea/censo_2024_mapas)")
     )
     
   )
@@ -188,7 +210,7 @@ server <- function(input, output, session) {
       filter(COD_REGION == as.numeric(input$region),
              CUT == as.numeric(input$comuna)) |>
       select(#COD_REGION, REGION, COMUNA, CUT, 
-             all_of(input$variable), SHAPE) |> 
+        all_of(input$variable), OBJECTID, SHAPE) |> 
       collect() |> 
       # obtener datos desde la base de datos
       st_as_sf(crs = 4326) # convertir a sf para mapas
@@ -216,15 +238,21 @@ server <- function(input, output, session) {
   
   
   # mapa ----
-  output$mapa <- renderPlot({
+  # output$mapa <- renderPlot({
+  mapa <- reactive({
     req(input$variable)
     req(input$comuna)
     req(nrow(datos_filtrados()) > 1)
     
     datos_filtrados() |> 
       ggplot() +
-      aes(fill = !!sym(input$variable)) +
-      geom_sf(color = "#181818", linewidth = 0.1) +
+      aes(fill = !!sym(input$variable),
+          data_id = OBJECTID) +
+      # geom_sf(color = "#181818", linewidth = 0.1) +
+      geom_sf_interactive(
+        # aes(tooltip = round(!!sym(input$variable), 2)),
+        aes(tooltip = paste0("<span class='id_variable'>", input$variable, ":</span> ", round(!!sym(input$variable), 2))),
+        color = "#181818", linewidth = 0.1) +
       # paleta de colores
       scale_fill_fermenter(palette = 13,
                            na.value = "#181818") +
@@ -232,6 +260,8 @@ server <- function(input, output, session) {
       theme(axis.text.x = element_text(angle = 90, vjust = .5),
             axis.ticks = element_blank(),
             panel.background = element_blank(),
+            plot.background = element_rect(fill = "#181818", color = NA),
+            legend.background = element_rect(fill = "#181818", color = NA),
             panel.grid = element_line(color = "#333333"),
             axis.text = element_text(color = "#444444"),
             legend.text = element_text(color = "#666666")) +
@@ -239,6 +269,34 @@ server <- function(input, output, session) {
                                  position = "top"))
     # labs(title = paste("Comuna de", unique(datos_filtrados()$COMUNA), ", Censo 2024"),
     # caption = "Fuente: Censo 2024, INE")
+  })
+  
+  # interactivo ----
+  output$mapa_interactivo <- renderGirafe({
+    req(mapa())
+    
+    girafe(ggobj = mapa(), bg = "#181818", 
+           width_svg = 7,
+           height_svg = 7,
+           options = list(
+             opts_sizing(rescale = TRUE),
+             opts_toolbar(hidden = c("selection"),
+                          fixed = TRUE,
+                          tooltips = list(zoom_on = "activar zoom y desplazamiento",
+                                          zoom_off = 'desactivar zoom', 
+                                          zoom_rect = 'zoom desde cuadro de selección',
+                                          zoom_reset = 'resetear zoom'),
+                          saveaspng = FALSE),
+             opts_sizing(width = .7),
+             opts_selection(type = "none"),
+             opts_zoom(duration = 400, min = 1, max = 10),
+             opts_hover(css = "stroke: #AE027E; stroke-width: 1;"),
+             opts_tooltip(css = "background-color: #181818; 
+                          color: #E8E8E8; font-size: 9pt;
+                          padding: 3px; 
+                          border-radius: 3px;")
+           )
+    )
   })
 }
 
