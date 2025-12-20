@@ -16,6 +16,10 @@ p {
   border: solid 1px #444444;
 }
 
+text {
+     font-family: Inter, helvetica, arial, sans-serf;
+}
+
 .azar {
   text-align: right; margin-top: -8px;
 }

@@ -5,12 +5,9 @@ library(ggplot2)
 library(ggiraph)
 library(arrow)
 library(sf)
-library(thematic)
 library(shinycssloaders)
 library(shinydisconnect)
 
-
-thematic_shiny() # tema automático
 
 # cargar datos de comunas y variables para acelerar app
 cut_comunas <- readRDS("cut_comunas.rds")
@@ -264,7 +261,9 @@ server <- function(input, output, session) {
             legend.background = element_rect(fill = "#181818", color = NA),
             panel.grid = element_line(color = "#333333"),
             axis.text = element_text(color = "#444444"),
-            legend.text = element_text(color = "#666666")) +
+            legend.key.size = unit(5, "mm"),
+            legend.text = element_text(color = "#666666", 
+                                       margin = margin(l = 4, r = 6))) +
       guides(fill = guide_legend(title = NULL,
                                  position = "top"))
     # labs(title = paste("Comuna de", unique(datos_filtrados()$COMUNA), ", Censo 2024"),

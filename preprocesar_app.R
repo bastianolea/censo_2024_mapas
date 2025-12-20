@@ -37,6 +37,7 @@ readr::write_rds(cut_comunas, "cut_comunas.rds")
 columnas <- dataset |> 
   select(where(is.numeric)) |> 
   select(-contains("SHAPE")) |> 
+  select(-c(1:16)) |> 
   names()
 
 readr::write_rds(columnas, "columnas.rds")
