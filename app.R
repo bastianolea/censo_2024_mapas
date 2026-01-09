@@ -8,6 +8,8 @@ library(sf)
 library(shinycssloaders)
 library(shinydisconnect)
 
+# cache en disco
+shinyOptions(cache = cachem::cache_disk("cache"))
 
 # cargar datos de comunas y variables para acelerar app
 cut_comunas <- readRDS("cut_comunas.rds")
@@ -296,7 +298,8 @@ server <- function(input, output, session) {
                           border-radius: 3px;")
            )
     )
-  })
+  }) |> 
+    bindCache(input$variable, input$comuna)
 }
 
 shinyApp(ui, server)
